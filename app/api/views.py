@@ -11,6 +11,6 @@ def search_movies(request):
     if not query:
         return Response({"error": "Query is required"}, status=400)
 
-    results = semantic_search(query)
+    results = semantic_search(query, k=10)
 
     return Response({"results": results})

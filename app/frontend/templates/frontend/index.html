@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Semantic Movie Search</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f4f6f9;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 80px auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 18px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            outline: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .search-box:focus {
+            border-color: #4f46e5;
+        }
+
+        .results {
+            margin-top: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            transition: transform 0.1s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .meta {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .description {
+            font-size: 14px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🎬 Semantic Movie Search</h1>
+
+    <input 
+        type="text" 
+        id="searchInput" 
+        class="search-box" 
+        placeholder="Search movies semantically..."
+    >
+
+    <div class="results" id="results"></div>
+</div>
+
+<script>
+const input = document.getElementById("searchInput");
+const resultsDiv = document.getElementById("results");
+
+let timeout = null;
+
+input.addEventListener("input", function () {
+    clearTimeout(timeout);
+
+    timeout = setTimeout(() => {
+        const query = input.value.trim();
+        if (query.length > 2) {
+            search(query);
+        } else {
+            resultsDiv.innerHTML = "";
+        }
+    }, 400); // debounce delay
+});
+
+async function search(query) {
+    const response = await fetch("/api/search/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ query: query })
+    });
+
+    const data = await response.json();
+    displayResults(data.results || data);
+}
+
+function displayResults(results) {
+    resultsDiv.innerHTML = "";
+
+    results.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        card.innerHTML = `
+            <div class="title">${item.title}</div>
+            <div class="meta">${item.type} • ${item.release_year}</div>
+            <div class="description">${item.description}</div>
+        `;
+
+        resultsDiv.appendChild(card);
+    });
+}
+</script>
+
+</body>
+</html>

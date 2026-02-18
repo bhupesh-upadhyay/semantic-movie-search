@@ -1,5 +1,5 @@
 """
-URL configuration for movies_api project.
+URL configuration for core project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/6.0/topics/http/urls/
@@ -15,11 +15,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from search_api.views import search_movies
+from django.urls import path, include
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("search/", search_movies),
+    path("", include("frontend.urls")),
+    path("api/", include("api.urls")),
 ]
