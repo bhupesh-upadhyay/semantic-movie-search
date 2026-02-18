@@ -1,0 +1,5 @@
+elasticsearch==8.15.0
+pandas
+sentence-transformers
+Django==6.0.2
+djangorestframework==3.16.1
