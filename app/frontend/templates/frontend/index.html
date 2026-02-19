@@ -101,39 +101,63 @@ input.addEventListener("input", function () {
         } else {
             resultsDiv.innerHTML = "";
         }
-    }, 400); // debounce delay
+    }, 400);
+});
+
+input.addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+        search(input.value.trim());
+    }
 });
 
 async function search(query) {
-    const response = await fetch("/api/search/", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ query: query })
-    });
+    if (!query) return;
 
-    const data = await response.json();
-    displayResults(data.results || data);
+    resultsDiv.innerHTML = "<p>Loading...</p>";
+
+    try {
+        const response = await fetch("/api/search/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ query: query })
+        });
+
+        const data = await response.json();
+        displayResults(data.results || data);
+    } catch (error) {
+        resultsDiv.innerHTML = "<p style='color:red;'>Error fetching results.</p>";
+    }
 }
 
 function displayResults(results) {
     resultsDiv.innerHTML = "";
 
+    if (!results || results.length === 0) {
+        resultsDiv.innerHTML = "<p>No results found.</p>";
+        return;
+    }
+
     results.forEach(item => {
         const card = document.createElement("div");
         card.className = "card";
 
+        const shortDesc = item.description.length > 150
+            ? item.description.substring(0, 150) + "..."
+            : item.description;
+
         card.innerHTML = `
             <div class="title">${item.title}</div>
             <div class="meta">${item.type} • ${item.release_year}</div>
-            <div class="description">${item.description}</div>
+            <div class="description">${shortDesc}</div>
         `;
 
         resultsDiv.appendChild(card);
     });
 }
 </script>
+
 
 </body>
 </html>
